@@ -1,28 +1,71 @@
-# Місце для вашого коду
-# Будь ласка, видаліть цей коментар та напишіть тут код для вашого варіанту
+import math
 
-# Приклад: Демонстраційний код
-# Ви можете видалити або закоментувати цей код перед тим, як писати свій
+# Читання координат та відстані до (0,0)
 try:
-    # Спроба відкрити файл input.txt для читання
-    # 'with' гарантує, що файл буде автоматично закритий
-    with open("input.txt", "r", encoding="utf-8") as file:
-        content = file.read()
-        print("Вміст файлу input.txt:")
-        print(content)
+    with open("coordinates.txt", "r", encoding="utf-8") as file:
+        lines = file.readlines()
+
+    points = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        x, y = line.split(",")
+        points.append((float(x), float(y)))
+
+    print("Відстані до початку координат:")
+    for x, y in points:
+        print(f"({x}, {y}) -> {math.hypot(x, y):.2f}")
 except FileNotFoundError:
-    # Обробка помилки, якщо файл не знайдено
-    print("Помилка: Файл 'input.txt' не знайдено!")
-    # Створюємо файл, щоб уникнути помилки при наступних запусках
-    with open("input.txt", "w", encoding="utf-8") as file:
-        file.write("Це демонстраційний вміст файлу input.txt.")
-    print("Створено новий файл 'input.txt' з демонстраційним вмістом.")
-except IOError as e:
-    # Обробка інших помилок вводу/виводу
-    print(f"Помилка читання файлу: {e}")
+    print("Файл coordinates.txt не знайдено!")
+    exit()
+except ValueError:
+    print("У файлі некоректні дані!")
+    exit()
+except IOError:
+    print("Помилка читання файлу coordinates.txt")
+    exit()
 
-print("\n" + "="*30 + "\n") # Розділювач для кращої читабельності
+# Точки в радіусі -> points_in_radius.txt
+try:
+    radius = float(input("Введіть радіус: "))
+    with open("points_in_radius.txt", "w", encoding="utf-8") as out:
+        for x, y in points:
+            if math.hypot(x, y) <= radius:
+                out.write(f"{x},{y}\n")
+    print("Точки в межах радіуса записано у файл points_in_radius.txt")
+except ValueError:
+    print("Радіус має бути числом!")
+except IOError:
+    print("Помилка запису у файл points_in_radius.txt")
 
-# Тут починайте писати код для вашого варіанту
-# Не забудьте створити відповідні файли з даними (наприклад, data1.txt, names.txt, і т.д.)
-# відповідно до вашого завдання.
+# 6-7. Найближча точка до (1,1) у файлі користувача
+filename = input("Введіть ім'я файлу: ")
+
+try:
+    with open(filename, "r", encoding="utf-8") as user_file:
+        user_lines = user_file.readlines()
+
+    nearest = None
+    min_dist = None
+    for line in user_lines:
+        line = line.strip()
+        if not line:
+            continue
+        x, y = line.split(",")
+        x, y = float(x), float(y)
+        dist = math.hypot(x - 1, y - 1)
+        if min_dist is None or dist < min_dist:
+            min_dist = dist
+            nearest = (x, y)
+
+    if nearest is None:
+        print("Файл порожній!")
+    else:
+        print(f"Найближча точка до (1,1): ({nearest[0]}, {nearest[1]})")
+except FileNotFoundError:
+    print(f"Файл {filename} не знайдено!")
+except ValueError:
+    print("У файлі некоректні дані!")
+except IOError:
+    print(f"Помилка читання файлу {filename}")
